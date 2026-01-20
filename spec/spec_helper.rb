@@ -2,7 +2,7 @@
 
 require "sentry_to_discord_for_rails"
 
-require "sentry_to_discord_for_rails"
+# require "sentry_to_discord_for_rails"
 require "webmock/rspec"
 require "action_controller/railtie"
 require "rspec/rails"

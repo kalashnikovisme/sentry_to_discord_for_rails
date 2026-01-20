@@ -3,6 +3,7 @@
 require "json"
 
 module SentryToDiscordForRails
+  # Converts Sentry payload to Discord webhook payload
   class Converter
     def initialize(payload)
       @payload = payload
@@ -20,27 +21,66 @@ module SentryToDiscordForRails
 
     attr_reader :payload
 
+    # rubocop:disable Metrics/MethodLength
     def sentry_attributes
-      event = payload["event"] || {}
-
       {
         event: event,
-        project: (if payload["project"].is_a?(Hash)
-                    payload.dig("project",
-                                "slug")
-                  else
-                    nil
-                  end) || payload["project"] || "Sentry",
-        title: event["title"] || event.dig("metadata", "title") || payload["title"] || "Sentry notification",
-        culprit: event["culprit"] || event.dig("metadata", "value"),
-        url: event["web_url"] || payload["web_url"] || payload["url"],
-        environment: event["environment"] || payload["environment"],
-        level: event["level"] || payload["level"],
-        release: event["release"] || payload["release"],
-        event_id: event["event_id"] || payload["event_id"],
-        timestamp: event["timestamp"] || payload["timestamp"],
-        message: event.dig("message", "formatted")
+        project: project_slug,
+        title: title,
+        culprit: culprit,
+        url: url,
+        environment: environment,
+        level: level,
+        release: release,
+        event_id: event_id,
+        timestamp: timestamp,
+        message: message_formatted
       }
+    end
+    # rubocop:enable Metrics/MethodLength
+
+    def event
+      @event ||= payload["event"] || {}
+    end
+
+    def project_slug
+      (payload["project"].is_a?(Hash) ? payload.dig("project", "slug") : nil) || payload["project"] || "Sentry"
+    end
+
+    def title
+      event["title"] || event.dig("metadata", "title") || payload["title"] || "Sentry notification"
+    end
+
+    def culprit
+      event["culprit"] || event.dig("metadata", "value")
+    end
+
+    def url
+      event["web_url"] || payload["web_url"] || payload["url"]
+    end
+
+    def environment
+      event["environment"] || payload["environment"]
+    end
+
+    def level
+      event["level"] || payload["level"]
+    end
+
+    def release
+      event["release"] || payload["release"]
+    end
+
+    def event_id
+      event["event_id"] || payload["event_id"]
+    end
+
+    def timestamp
+      event["timestamp"] || payload["timestamp"]
+    end
+
+    def message_formatted
+      event.dig("message", "formatted")
     end
 
     def build_fallback_message(details)
@@ -53,25 +93,31 @@ module SentryToDiscordForRails
     end
 
     def build_embed(details)
-      description_parts = []
-      description_parts << details[:message] if details[:message].present?
-      description_parts << "Location: #{details[:culprit]}" if details[:culprit].present?
-
-      fields = []
-      fields << { name: "Project", value: details[:project], inline: true } if details[:project].present?
-      fields << { name: "Environment", value: details[:environment], inline: true } if details[:environment].present?
-      fields << { name: "Level", value: details[:level], inline: true } if details[:level].present?
-      fields << { name: "Release", value: details[:release], inline: true } if details[:release].present?
-      fields << { name: "Event ID", value: details[:event_id], inline: true } if details[:event_id].present?
-
       {
         title: details[:title],
         url: details[:url],
-        description: description_parts.join("\n").presence,
+        description: build_description(details),
         color: 0xFF0000,
-        fields: fields,
+        fields: build_fields(details),
         timestamp: details[:timestamp]
       }.compact
+    end
+
+    def build_description(details)
+      [
+        details[:message],
+        ("Location: #{details[:culprit]}" if details[:culprit].present?)
+      ].compact.join("\n").presence
+    end
+
+    def build_fields(details)
+      [
+        ({ name: "Project", value: details[:project], inline: true } if details[:project].present?),
+        ({ name: "Environment", value: details[:environment], inline: true } if details[:environment].present?),
+        ({ name: "Level", value: details[:level], inline: true } if details[:level].present?),
+        ({ name: "Release", value: details[:release], inline: true } if details[:release].present?),
+        ({ name: "Event ID", value: details[:event_id], inline: true } if details[:event_id].present?)
+      ].compact
     end
   end
 end

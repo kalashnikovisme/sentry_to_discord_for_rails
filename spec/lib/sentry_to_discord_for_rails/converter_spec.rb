@@ -28,12 +28,12 @@ RSpec.describe SentryToDiscordForRails::Converter do
 
       expect(result[:content]).to include("**test-project**")
       expect(result[:content]).to include("Test Error")
-      
+
       embed = result[:embeds].first
       expect(embed[:title]).to eq("Test Error")
       expect(embed[:url]).to eq("https://sentry.io/test-project/events/evt123/")
       expect(embed[:color]).to eq(0xFF0000)
-      
+
       fields = embed[:fields]
       expect(fields).to include(include(name: "Project", value: "test-project"))
       expect(fields).to include(include(name: "Environment", value: "production"))

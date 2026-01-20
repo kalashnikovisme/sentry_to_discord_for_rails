@@ -3,6 +3,7 @@
 require "faraday"
 
 module SentryToDiscordForRails
+  # Sends payloads to Discord via Webhook
   class Notifier
     def initialize(discord_webhook_url)
       @discord_webhook_url = discord_webhook_url

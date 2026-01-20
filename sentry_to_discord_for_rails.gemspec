@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.email = ["kalashnikovisme@gmail.com"]
 
   spec.summary = "Rails Engine to forward Sentry webhooks to Discord."
-  spec.description = "A Rails Engine that receives Sentry webhooks and forwards them to a configured Discord webhook with rich formatting."
+  spec.description = "A Rails Engine that receives Sentry webhooks and forwards them to a configured Discord webhook " \
+                     "with rich formatting."
   spec.homepage = "https://github.com/kalashnikovisme/sentry_to_discord_for_rails"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
