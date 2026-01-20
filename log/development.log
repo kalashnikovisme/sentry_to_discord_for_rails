@@ -1,0 +1,16 @@
+Processing by Webhooks::SentryController#create as JSON
+  Parameters: {"project" => "test", "event" => {}}
+Completed 400 Bad Request in 0ms (GC: 0.0ms)
+
+
+Processing by Webhooks::SentryController#create as JSON
+  Parameters: {"project" => "test", "event" => {}}
+Completed 200 OK in 0ms (GC: 0.0ms)
+
+
+Processing by Webhooks::SentryController#create as JSON
+  Parameters: {"project" => "test", "event" => {}}
+Completed 502 Bad Gateway in 0ms (GC: 0.0ms)
+
+
+[Sentry Webhook] Discord responded with status 500
